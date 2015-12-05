@@ -1,0 +1,12 @@
+rpi-occu:
+ image: marbon87/rpi-occu:latest
+ hostname: rpi-occu
+ privileged: true
+# restart: always
+ devices:
+  - "/dev/mem:/dev/mem"
+  - "/dev/ttyAMA0:/dev/ttyAMA0" 
+ ports:
+  - "8080:80"
+ volumes:
+  - /etc/localtime:/etc/localtime:ro
