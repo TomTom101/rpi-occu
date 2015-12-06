@@ -1,4 +1,4 @@
-FROM 	marbon87/rpi-occu
+FROM 	marbon87/rpi-java
 MAINTAINER Mark Bonnekessel <marbon@mailbox.org>
 
 #       Install packages------------------------------------------------------
@@ -8,6 +8,7 @@ RUN 	apt-get update && apt-get install -y \
         tcllib \
         libusb-1.0-0-dev \
         unzip \
+        rsyslog \
         --no-install-recommends && \
         rm -rf /var/lib/apt/lists/*
 
@@ -21,13 +22,43 @@ WORKDIR /root/temp/occu-master/arm-gnueabihf
 
 #       Copy file to /opt/hm---------------------------------------------------
 RUN     ./install.sh
+WORKDIR /root/temp/occu-master
+RUN     cp -a firmware /opt/hm && ln -s /opt/hm/firmware /etc/config/firmware
 RUN     ln -s /opt/hm/etc/config /etc/config
 
 #       Configure rfd----------------------------------------------------------
-ADD     ./rfd.conf /etc/config/rfd.conf
-ENV     HM_HOME=/opt/hm
-ENV     LD_LIBRARY=$HM_HOME/lib
+ADD     ./config/rfd.conf /etc/config/rfd.conf
+ADD     ./init.d/rfd /etc/init.d/rfd
+RUN     chmod +x /etc/init.d/rfd && update-rc.d rfd defaults
+ADD     ./supervisor/gpio_init.conf /etc/supervisor/conf.d/gpio_init.conf
+ADD     ./supervisor/rfd.conf /etc/supervisor/conf.d/rfd.conf
 
+ENV     HM_HOME=/opt/hm
+ENV     LD_LIBRARY_PATH=$HM_HOME/lib
+
+#       lighttpd--------------------------------------------------------------
+ADD     ./init.d/lighttpd /etc/init.d/lighttpd
+RUN     chmod +x /etc/init.d/lighttpd && update-rc.d lighttpd defaults
+ADD     ./supervisor/lighttpd.conf /etc/supervisor/conf.d/lighttpd.conf
+
+#       ReGaHss---------------------------------------------------------------
+WORKDIR /root/temp/occu-master/WebUI
+RUN     cp -a bin www /opt/hm
+ADD     ./hm_config/syslog /opt/hm/etc/config/syslog
+ADD     ./hm_config/netconfig /opt/hm/etc/config/netconfig
+ADD     ./hm_config/TZ /opt/hm/etc/config/TZ
+ADD     ./boot/VERSION /boot/VERSION
+RUN     ln -s /opt/hm/www /www
+ADD     ./supervisor/rega.conf /etc/supervisor/conf.d/rega.conf
+
+RUN     sed -i 's/catch {exec killall syslogd}/#catch {exec killall syslogd}/g' /opt/hm/www/config/cp_maintenance.cgi
+RUN     sed -i 's/catch {exec killall klogd}/#catch {exec killall klogd}/g' /opt/hm/www/config/cp_maintenance.cgi
+RUN     sed -i 's/exec \/etc\/init.d\/S01logging start/exec \/etc\/init.d\/rsyslog restart/g' /opt/hm/www/config/cp_maintenance.cgi 
+
+ADD     ./bin/firmware_update.sh /opt/hm/bin/firmware_update.sh
+
+#       move back to /root----------------------------------------------------
+WORKDIR /root
 #       cleanup a bit---------------------------------------------------------
 RUN     apt-get clean && apt-get purge
 

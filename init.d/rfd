@@ -1,0 +1,43 @@
+### BEGIN INIT INFO
+# Provides:             rfd
+# Required-Start:       $local_fs $remote_fs
+# Required-Stop:        $local_fs $remote_fs
+# Default-Start:        2 3 4 5
+# Default-Stop:         0 1 6
+# Short-Description:    Start rfd
+### END INIT INFO
+
+start() {
+        echo -n "Starting rfd: "
+        export HM_HOME=/opt/hm
+        export LD_LIBRARY_PATH=$HM_HOME/lib
+        start-stop-daemon -S -q -m -p /var/run/rfd.pid --exec $HM_HOME/bin/rfd -- -d -l 0 -f /opt/hm/etc/config/rfd.conf
+        echo "OK"
+}
+stop() {
+        echo -n "Stopping rfd: "
+        start-stop-daemon -K -q -p /var/run/rfd.pid
+        echo "OK"
+}
+restart() {
+        stop
+        start
+}
+
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  restart|reload)
+        restart
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?
+
