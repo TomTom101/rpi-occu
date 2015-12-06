@@ -23,8 +23,8 @@ WORKDIR /root/temp/occu-master/arm-gnueabihf
 #       Copy file to /opt/hm---------------------------------------------------
 RUN     ./install.sh
 WORKDIR /root/temp/occu-master
-RUN     cp -a firmware /opt/hm && ln -s /opt/hm/firmware /etc/config/firmware
 RUN     ln -s /opt/hm/etc/config /etc/config
+RUN     cp -a firmware /opt/hm && ln -s /opt/hm/firmware /etc/config/firmware
 
 #       Configure rfd----------------------------------------------------------
 ADD     ./config/rfd.conf /etc/config/rfd.conf
