@@ -9,5 +9,9 @@ rpi-occu:
  ports:
   - "80:80"
   - "443:443"
+# volumes_from:
+#  - rpi-occu-data
  volumes:
   - /etc/localtime:/etc/localtime:ro
+  - /opt/hm
+
