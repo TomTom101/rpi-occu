@@ -23,8 +23,9 @@ WORKDIR /root/temp/occu-master/arm-gnueabihf
 #       Copy file to /opt/hm---------------------------------------------------
 RUN     ./install.sh
 WORKDIR /root/temp/occu-master
-RUN     ln -s /opt/hm/etc/config /etc/config
+RUN     ln -s /opt/hm/etc/config /usr/local/etc && ln -s /opt/hm/etc/config /etc
 RUN     cp -a firmware /opt/hm && ln -s /opt/hm/firmware /etc/config/firmware
+RUN     cp -a HMserver/etc/config_templates/log4j.xml /opt/hm/etc/config && cp -a HMserver/opt/HMServer /opt
 
 #       Configure rfd----------------------------------------------------------
 ADD     ./config/rfd.conf /etc/config/rfd.conf
@@ -51,11 +52,16 @@ ADD     ./boot/VERSION /boot/VERSION
 RUN     ln -s /opt/hm/www /www
 ADD     ./supervisor/rega.conf /etc/supervisor/conf.d/rega.conf
 
+#       HMServer--------------------------------------------------------------
+ADD     ./supervisor/HMServer.conf /etc/supervisor/conf.d/HMServer.conf
+
 RUN     sed -i 's/catch {exec killall syslogd}/#catch {exec killall syslogd}/g' /opt/hm/www/config/cp_maintenance.cgi
 RUN     sed -i 's/catch {exec killall klogd}/#catch {exec killall klogd}/g' /opt/hm/www/config/cp_maintenance.cgi
 RUN     sed -i 's/exec \/etc\/init.d\/S01logging start/exec \/etc\/init.d\/rsyslog restart/g' /opt/hm/www/config/cp_maintenance.cgi 
 
 ADD     ./bin/firmware_update.sh /opt/hm/bin/firmware_update.sh
+ADD     ./bin/crypttool /bin/crypttool
+RUN     chmod +x /bin/crypttool
 
 #       move back to /root----------------------------------------------------
 WORKDIR /root

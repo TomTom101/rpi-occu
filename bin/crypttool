@@ -1,0 +1,5 @@
+#!/bin/sh
+export HM_HOME=/opt/hm
+export LD_LIBRARY_PATH=$HM_HOME/lib
+exec $HM_HOME/bin/crypttool $@
+
