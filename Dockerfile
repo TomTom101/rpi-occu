@@ -12,6 +12,7 @@ RUN 	apt-get update && apt-get install -y \
         --no-install-recommends && \
         rm -rf /var/lib/apt/lists/*
 
+ADD     ./supervisor/rsyslog.conf /etc/supervisor/conf.d/rsyslog.conf
 #       Preparation-----------------------------------------------------------
 RUN     mkdir -p /opt/hm && mkdir -p /root/temp 
 WORKDIR /root/temp
