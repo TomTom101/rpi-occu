@@ -1,8 +1,8 @@
 rpi-occu:
- image: marbon87/rpi-occu:0.0.1
+ image: marbon87/rpi-occu:2.15.5
  hostname: rpi-occu
  privileged: true
- restart: always
+# restart: unless-stopped    
  devices:
   - "/dev/mem:/dev/mem"
   - "/dev/ttyAMA0:/dev/ttyAMA0" 
@@ -15,4 +15,5 @@ rpi-occu:
   - /etc/localtime:/etc/localtime:ro
     #  - /usr/local/etc/config
   - /opt/hm
+ tty: true
 
