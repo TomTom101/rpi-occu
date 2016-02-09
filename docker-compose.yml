@@ -2,7 +2,7 @@ rpi-occu:
  image: marbon87/rpi-occu:2.15.5
  hostname: rpi-occu
  privileged: true
-# restart: unless-stopped    
+ restart: unless-stopped    
  devices:
   - "/dev/mem:/dev/mem"
   - "/dev/ttyAMA0:/dev/ttyAMA0" 

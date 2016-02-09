@@ -53,10 +53,10 @@ RUN     ln -s /opt/hm/www /www
 RUN     systemctl enable regahss
 
 #       HMServer--------------------------------------------------------------
-# TODO: HMServer
 WORKDIR /root/temp/occu-${OCCU_VERSION}/HMserver
-ADD     ./init.d/HMserver /etc/init.d/HMserver
+RUN     echo "#!/bin/sh\n### BEGIN INIT INFO\n# Provides:          HMserver\n# Required-Start:    \$network \$remote_fs \$syslog\n# Required-Stop:     \$network \$remote_fs \$syslog\n# Default-Start:     2 3 4 5\n# Default-Stop:      0 1 6\n# Short-Description: HomeMatic HMserver service\n# Description:       HomeMatic HMserver service\n### END INIT INFO\n" "$(tail -n +5 ./etc/init.d)" > /etc/init.d/HMserver
 RUN     chmod +x /etc/init.d/HMserver
+RUN     sed -i "s|java|${JAVA_HOME}/bin/java|g" /etc/init.d/HMserver
 RUN     systemctl enable HMserver
 
 #       move back to /root----------------------------------------------------
