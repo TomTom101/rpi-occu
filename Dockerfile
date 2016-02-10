@@ -59,6 +59,9 @@ RUN     chmod +x /etc/init.d/HMserver
 RUN     sed -i "s|java|${JAVA_HOME}/bin/java|g" /etc/init.d/HMserver
 RUN     systemctl enable HMserver
 
+#       HMServer--------------------------------------------------------------
+ADD     ./bin /bin
+
 #       move back to /root----------------------------------------------------
 WORKDIR /root
 #       cleanup a bit---------------------------------------------------------
