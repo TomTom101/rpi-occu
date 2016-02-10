@@ -1,19 +1,27 @@
-rpi-occu:
- image: marbon87/rpi-occu:2.15.5
- hostname: rpi-occu
- privileged: true
- restart: unless-stopped    
- devices:
-  - "/dev/mem:/dev/mem"
-  - "/dev/ttyAMA0:/dev/ttyAMA0" 
- ports:
-  - "80:80"
-  - "443:443"
-# volumes_from:
-#  - rpi-occu-data
- volumes:
-  - /etc/localtime:/etc/localtime:ro
-    #  - /usr/local/etc/config
-  - /opt/hm
- tty: true
+version: '2'
+services:
+ rpi-occu-init:
+  image: resin/raspberrypi2-debian:jessie
+  privileged: true
+  restart: unless-stopped    
+  network_mode: "none"
+  command: /bin/bash -c "if [ ! -d /sys/class/gpio/gpio18 ]; then echo 18 > /sys/class/gpio/export; fi && echo out > /sys/class/gpio/gpio18/direction && sleep infinity"
+
+ rpi-occu:
+  image: marbon87/rpi-occu:2.15.5
+  depends_on:
+   - rpi-occu-init
+  hostname: rpi-occu
+  privileged: true
+  restart: unless-stopped    
+  devices:
+   - "/dev/mem:/dev/mem"
+   - "/dev/ttyAMA0:/dev/ttyAMA0" 
+  ports:
+   - "80:80"
+   - "443:443"
+  volumes:
+   - /etc/localtime:/etc/localtime:ro
+   - /opt/hm
+  tty: true
 
