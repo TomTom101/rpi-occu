@@ -44,6 +44,7 @@ RUN     systemctl enable rfd
 
 #       lighttpd--------------------------------------------------------------
 RUN     systemctl enable lighttpd
+RUN     sed -i "s|#server.errorlog-use-syslog|server.errorlog-use-syslog|g" $HM_HOME/etc/lighttpd/lighttpd.conf
 
 #       ReGaHss---------------------------------------------------------------
 WORKDIR /root/temp/occu-${OCCU_VERSION}/WebUI
