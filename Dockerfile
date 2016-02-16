@@ -56,6 +56,11 @@ ADD     ./boot/VERSION /boot/VERSION
 RUN     ln -s /opt/hm/www /www
 RUN     systemctl enable regahss
 
+## Allow restart of rsyslog
+RUN     sed -i "s|catch {exec killall syslogd}|#catch {exec killall syslogd}|g" /opt/hm/www/config/cp_maintenance.cgi 
+RUN     sed -i "s|catch {exec killall klogd}|#catch {exec killall klogd}|g" /opt/hm/www/config/cp_maintenance.cgi 
+RUN     sed -i "s|exec /etc/init.d/S01logging start|exec systemctl restart rsyslog|g" /opt/hm/www/config/cp_maintenance.cgi 
+
 #       HMServer--------------------------------------------------------------
 WORKDIR /root/temp/occu-${OCCU_VERSION}/HMserver
 RUN     echo "#!/bin/sh\n### BEGIN INIT INFO\n# Provides:          HMserver\n# Required-Start:    \$network \$remote_fs \$syslog\n# Required-Stop:     \$network \$remote_fs \$syslog\n# Default-Start:     2 3 4 5\n# Default-Stop:      0 1 6\n# Short-Description: HomeMatic HMserver service\n# Description:       HomeMatic HMserver service\n### END INIT INFO\n" "$(tail -n +5 ./etc/init.d)" > /etc/init.d/HMserver
