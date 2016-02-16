@@ -35,3 +35,6 @@ chmod +x /var/update_script
 cd /var/
 /var/update_script CCU2
 
+# Fallback
+/sbin/reboot
+

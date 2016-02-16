@@ -52,7 +52,7 @@ RUN     cp -a bin www /opt/hm
 ADD     ./hm_config/syslog /opt/hm/etc/config/syslog
 ADD     ./hm_config/netconfig /opt/hm/etc/config/netconfig
 ADD     ./hm_config/TZ /opt/hm/etc/config/TZ
-ADD     ./boot/VERSION /boot/VERSION
+RUN     echo "VERSION=${OCCU_VERSION}" > /boot/VERSION
 RUN     ln -s /opt/hm/www /www
 RUN     systemctl enable regahss
 
@@ -68,8 +68,17 @@ RUN     chmod +x /etc/init.d/HMserver
 RUN     sed -i "s|java|${JAVA_HOME}/bin/java|g" /etc/init.d/HMserver
 RUN     systemctl enable HMserver
 
-#       HMServer--------------------------------------------------------------
+#       Modifications for backup,restore and add-on installation--------------
 ADD     ./bin /bin
+RUN     chmod +x  /bin/crypttool /bin/firmware_update.sh
+RUN     sed -i "s|exec /bin/kill -SIGQUIT 1|#exec /bin/kill -SIGQUIT 1\n        # OCCU: Erst noch die homematic.regadom sichern\n        rega system.Save()\n        # OCCU: Then execute firmware update script\n        exec /opt/hm/bin/firmware_update.sh|g" /opt/hm/www/config/cp_software.cgi
+RUN     sed -i "s|exec umount /usr/local|#exec umount /usr/local|g"  /opt/hm/www/config/cp_security.cgi && \
+sed -i "s|exec /usr/sbin/ubidetach -p /dev/mtd6|#exec /usr/sbin/ubidetach -p /dev/mtd6|g"  /opt/hm/www/config/cp_security.cgi && \
+sed -i "s|exec /usr/sbin/ubiformat /dev/mtd6 -y|#exec /usr/sbin/ubiformat /dev/mtd6 -y|g"  /opt/hm/www/config/cp_security.cgi && \
+sed -i "s|exec /usr/sbin/ubiattach -p /dev/mtd6|#exec /usr/sbin/ubiattach -p /dev/mtd6|g"  /opt/hm/www/config/cp_security.cgi && \
+sed -i "s|exec /usr/sbin/ubimkvol /dev/ubi1 -N user -m|#exec /usr/sbin/ubimkvol /dev/ubi1 -N user -m|g"  /opt/hm/www/config/cp_security.cgi && \
+sed -i "s|exec mount /usr/local|#exec mount /usr/local|g"  /opt/hm/www/config/cp_security.cgi
+RUN     touch /var/ids
 
 #       move back to /root----------------------------------------------------
 WORKDIR /root
