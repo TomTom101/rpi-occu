@@ -80,6 +80,17 @@ sed -i "s|exec /usr/sbin/ubimkvol /dev/ubi1 -N user -m|#exec /usr/sbin/ubimkvol 
 sed -i "s|exec mount /usr/local|#exec mount /usr/local|g"  /opt/hm/www/config/cp_security.cgi
 RUN     touch /var/ids
 
+#       Simulate sd-card------------------------------------------------------
+RUN     mkdir -p /media/sd-mmcblk0/measurement && \
+        mkdir -p /opt/HMServer/measurement && \
+        mkdir -p /etc/config/measurement && \
+        mkdir -p /var/status && \
+        touch /var/status/hasSD && \
+        touch /var/status/SDinitialised && \
+        touch /media/sd-mmcblk0/.initialised
+
+
+
 #       move back to /root----------------------------------------------------
 WORKDIR /root
 #       cleanup a bit---------------------------------------------------------

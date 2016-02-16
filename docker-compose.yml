@@ -23,5 +23,6 @@ services:
   volumes:
    - /etc/localtime:/etc/localtime:ro
    - /opt/hm
+   - /media/sd-mmcblk0
   tty: true
 
