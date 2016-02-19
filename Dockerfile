@@ -36,22 +36,31 @@ WORKDIR /root/temp/occu-${OCCU_VERSION}
 RUN     ln -s /opt/hm/etc/config /usr/local/etc && ln -s /opt/hm/etc/config /etc
 RUN     cp -a firmware /opt/hm && ln -s /opt/hm/firmware /etc/config/firmware
 RUN     cp -a HMserver/etc/config_templates/log4j.xml /opt/hm/etc/config && cp -a HMserver/opt/HMServer /opt
+RUN     sed -i "s|INFO|WARN|g" /opt/hm/etc/config/log4j.xml
 RUN     cp -a scripts/debian/init.d/* /etc/init.d
 
+#       Add default config-----------------------------------------------------
+ADD     ./config/ /etc/config/
+
 #       Configure rfd----------------------------------------------------------
-ADD     ./config/rfd.conf /etc/config/rfd.conf
 RUN     systemctl enable rfd
 
 #       lighttpd--------------------------------------------------------------
 RUN     systemctl enable lighttpd
 RUN     sed -i "s|#server.errorlog-use-syslog|server.errorlog-use-syslog|g" $HM_HOME/etc/lighttpd/lighttpd.conf
 
+#       lighttpd:configure ssl------------------------------------------------
+RUN     cp /etc/init.d/lighttpd /etc/init.d/lighttpd_ssl
+RUN     sed -i "s|# Provides:          lighttpd|# Provides:          lighttpd_ssl|g" /etc/init.d/lighttpd_ssl
+RUN     sed -i "s|NAME=lighttpd|NAME=lighttpd_ssl|g" /etc/init.d/lighttpd_ssl
+RUN     sed -i "s|DAEMON=\$HM_HOME/bin/\$NAME|DAEMON=\$HM_HOME/bin/lighttpd|g" /etc/init.d/lighttpd_ssl
+RUN     sed -i "s|lighttpd.conf|lighttpd_ssl.conf|g" /etc/init.d/lighttpd_ssl
+RUN     sed -i "s|lighttpd.pid|lighttpd_ssl.pid|g" /opt/hm/etc/lighttpd/lighttpd_ssl.conf
+RUN     systemctl enable lighttpd_ssl
+
 #       ReGaHss---------------------------------------------------------------
 WORKDIR /root/temp/occu-${OCCU_VERSION}/WebUI
 RUN     cp -a bin www /opt/hm
-ADD     ./hm_config/syslog /opt/hm/etc/config/syslog
-ADD     ./hm_config/netconfig /opt/hm/etc/config/netconfig
-ADD     ./hm_config/TZ /opt/hm/etc/config/TZ
 RUN     echo "VERSION=${OCCU_VERSION}" > /boot/VERSION
 RUN     ln -s /opt/hm/www /www
 RUN     systemctl enable regahss
@@ -89,6 +98,8 @@ RUN     mkdir -p /media/sd-mmcblk0/measurement && \
         touch /var/status/SDinitialised && \
         touch /media/sd-mmcblk0/.initialised
 
+#       Fix time settings-----------------------------------------------------
+RUN     (crontab -l ; echo "*/30 * * * * /opt/hm/bin/SetInterfaceClock 127.0.0.1:2001") | sort - | uniq - | crontab -
 
 
 #       move back to /root----------------------------------------------------

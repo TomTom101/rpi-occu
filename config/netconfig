@@ -1,0 +1,5 @@
+HOSTNAME=rpi-occu
+MODE=DHCP
+CRYPT=0
+nodaemon=true
+

@@ -1,0 +1,91 @@
+Sending build context to Docker daemon  21.5 kB
+Step 1 : FROM marbon87/rpi-java
+ ---> f92146c8150c
+Step 2 : MAINTAINER Mark Bonnekessel <marbon@mailbox.org>
+ ---> Using cache
+ ---> cce6fae9be1b
+Step 3 : RUN apt-get update && apt-get install -y         msmtp         tcl         tcllib         libusb-1.0-0-dev         unzip         rsyslog         cron         man         sendmail         --no-install-recommends &&         rm -rf /var/lib/apt/lists/*
+ ---> Using cache
+ ---> 77a8ceccaed5
+Step 4 : ENV INITSYSTEM on
+ ---> Using cache
+ ---> a6b720ba2f09
+Step 5 : RUN mkdir -p /opt/hm && mkdir -p /root/temp
+ ---> Using cache
+ ---> d08575aeffba
+Step 6 : WORKDIR /root/temp
+ ---> Using cache
+ ---> 9e6f06280a62
+Step 7 : ENV HM_HOME /opt/hm
+ ---> Using cache
+ ---> 4edb3875f5f6
+Step 8 : ENV LD_LIBRARY_PATH $HM_HOME/lib
+ ---> Using cache
+ ---> d56596febaaf
+Step 9 : ENV OCCU_VERSION 2.15.5
+ ---> Using cache
+ ---> 9d543e8a88bf
+Step 10 : RUN wget -O occu.zip https://github.com/eq-3/occu/archive/${OCCU_VERSION}.zip ; unzip -q occu.zip; rm occu.zip
+ ---> Using cache
+ ---> 479f6604c8d6
+Step 11 : WORKDIR /root/temp/occu-${OCCU_VERSION}/arm-gnueabihf
+ ---> Using cache
+ ---> 9ed274c173b3
+Step 12 : RUN ./install.sh
+ ---> Using cache
+ ---> 3b5215618015
+Step 13 : WORKDIR /root/temp/occu-${OCCU_VERSION}
+ ---> Using cache
+ ---> 9f94ba7edafa
+Step 14 : RUN ln -s /opt/hm/etc/config /usr/local/etc && ln -s /opt/hm/etc/config /etc
+ ---> Using cache
+ ---> 0a7963a72e3e
+Step 15 : RUN cp -a firmware /opt/hm && ln -s /opt/hm/firmware /etc/config/firmware
+ ---> Using cache
+ ---> e8a28720e307
+Step 16 : RUN cp -a HMserver/etc/config_templates/log4j.xml /opt/hm/etc/config && cp -a HMserver/opt/HMServer /opt
+ ---> Using cache
+ ---> a463e0bce1c2
+Step 17 : RUN sed -i "s|INFO|WARN|g" /opt/hm/etc/config/log4j.xml
+ ---> Using cache
+ ---> 09c3141db902
+Step 18 : RUN cp -a scripts/debian/init.d/* /etc/init.d
+ ---> Using cache
+ ---> 2f8d5247d0d0
+Step 19 : ADD ./config/ /etc/config/
+ ---> Using cache
+ ---> db1a384a4f41
+Step 20 : RUN systemctl enable rfd
+ ---> Using cache
+ ---> 80cae521c112
+Step 21 : RUN systemctl enable lighttpd
+ ---> Using cache
+ ---> 42eedbf21c19
+Step 22 : RUN sed -i "s|#server.errorlog-use-syslog|server.errorlog-use-syslog|g" $HM_HOME/etc/lighttpd/lighttpd.conf
+ ---> Using cache
+ ---> c13179887a31
+Step 23 : RUN cp /etc/init.d/lighttpd /etc/init.d/lighttpd_ssl
+ ---> Using cache
+ ---> 9a611f173978
+Step 24 : RUN sed -i "s|NAME=lighttpd|NAME=lighttpd_ssl|g" /etc/init.d/lighttpd_ssl
+ ---> Using cache
+ ---> 5c0a42573ffa
+Step 25 : RUN sed -i "s|DAEMON=\$HM_HOME/bin/\$NAME|DAEMON=\$HM_HOME/bin/lighttpd|g" /etc/init.d/lighttpd_ssl
+ ---> Using cache
+ ---> a509b180cd70
+Step 26 : RUN sed -i "s|lighttpd.conf|lighttpd_ssl.conf|g" /etc/init.d/lighttpd_ssl
+ ---> Using cache
+ ---> 2385f49957e6
+Step 27 : RUN sed -i "s|lighttpd.pid|lighttpd_ssl.pid|g" /opt/hm/etc/lighttpd/lighttpd_ssl.conf
+ ---> Using cache
+ ---> f23f9632f1dd
+Step 28 : RUN systemctl enable lighttpd_ssl
+ ---> Running in de9ddc8f15e7
+[91mSynchronizing state for lighttpd_ssl.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d lighttpd_ssl defaults
+[0m[91minsserv: script lighttpd_ssl: service lighttpd already provided!
+insserv: exiting now!
+[0m[91mupdate-rc.d: error: insserv rejected the script header
+*** Error in `systemctl': double free or corruption (fasttop): 0x00dce878 ***
+[0m[91mAborted (core dumped)
+[0mThe command '/bin/sh -c systemctl enable lighttpd_ssl' returned a non-zero code: 134
