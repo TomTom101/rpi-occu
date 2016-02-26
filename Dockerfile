@@ -111,8 +111,8 @@ RUN     ln -s /usr/bin/tclsh /bin/tclsh
 #       Allow to configure logging from webgui--------------------------------
 RUN     sed -i "s|/bin/sh|/bin/bash|g" /etc/init.d/rfd && \
 sed -i "s|/bin/sh|/bin/bash|g" /etc/init.d/regahss && \
-sed -i "s|LOGLEVEL_RFD=0|if [ -f /usr/local/etc/config/syslog ] ; then source /usr/local/etc/config/syslog ; else LOGLEVEL_RFD=5 ; fi|g" /etc/init.d/rfd && \
-sed -i "s|LOGLEVEL_REGAHSS=0|if [ -f /usr/local/etc/config/syslog ] ; then source /usr/local/etc/config/syslog ; LOGLEVEL_REGA=0 ; fi|g" /etc/init.d/regahss && \
+sed -i "s|LOGLEVEL_RFD=0|if [ -f /usr/local/etc/config/syslog ] ; then source /usr/local/etc/config/syslog ; else LOGLEVEL_RFD=0 ; fi|g" /etc/init.d/rfd && \
+sed -i "s|LOGLEVEL_REGAHSS=0|if [ -f /usr/local/etc/config/syslog ] ; then source /usr/local/etc/config/syslog ; else LOGLEVEL_REGA=0 ; fi|g" /etc/init.d/regahss && \
 sed -i "s|LOGLEVEL_REGAHSS|LOGLEVEL_REGA|g" /etc/init.d/regahss 
 
 #       move back to /root----------------------------------------------------
