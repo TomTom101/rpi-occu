@@ -82,7 +82,7 @@ RUN     systemctl enable HMserver
 #       Modifications for backup,restore and add-on installation--------------
 ADD     ./bin /bin
 RUN     chmod +x  /bin/crypttool /bin/firmware_update.sh
-RUN     sed -i "s|exec /bin/kill -SIGQUIT 1|#exec /bin/kill -SIGQUIT 1\n        # OCCU: Erst noch die homematic.regadom sichern\n        rega system.Save()\n        # OCCU: Then execute firmware update script\n        exec /opt/hm/bin/firmware_update.sh|g" /opt/hm/www/config/cp_software.cgi
+RUN     sed -i "s|exec /bin/kill -SIGQUIT 1|#exec /bin/kill -SIGQUIT 1\n        # OCCU: Erst noch die homematic.regadom sichern\n        rega system.Save()\n        # OCCU: Then execute firmware update script\n        exec /bin/firmware_update.sh|g" /opt/hm/www/config/cp_software.cgi
 RUN     sed -i "s|exec umount /usr/local|#exec umount /usr/local|g"  /opt/hm/www/config/cp_security.cgi && \
 sed -i "s|exec /usr/sbin/ubidetach -p /dev/mtd6|#exec /usr/sbin/ubidetach -p /dev/mtd6|g"  /opt/hm/www/config/cp_security.cgi && \
 sed -i "s|exec /usr/sbin/ubiformat /dev/mtd6 -y|#exec /usr/sbin/ubiformat /dev/mtd6 -y|g"  /opt/hm/www/config/cp_security.cgi && \
@@ -115,6 +115,9 @@ sed -i "s|/bin/sh|/bin/bash|g" /etc/init.d/regahss && \
 sed -i "s|LOGLEVEL_RFD=0|if [ -f /usr/local/etc/config/syslog ] ; then source /usr/local/etc/config/syslog ; else LOGLEVEL_RFD=0 ; fi|g" /etc/init.d/rfd && \
 sed -i "s|LOGLEVEL_REGAHSS=0|if [ -f /usr/local/etc/config/syslog ] ; then source /usr/local/etc/config/syslog ; else LOGLEVEL_REGA=0 ; fi|g" /etc/init.d/regahss && \
 sed -i "s|LOGLEVEL_REGAHSS|LOGLEVEL_REGA|g" /etc/init.d/regahss 
+
+#       create folder for addons----------------------------------------------
+RUN     mkdir -p /usr/local/etc/config/rc.d
 
 #       move back to /root----------------------------------------------------
 WORKDIR /root
