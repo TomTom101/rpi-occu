@@ -35,7 +35,7 @@ RUN     ./install.sh
 WORKDIR /root/temp/occu-${OCCU_VERSION}
 RUN     mv /opt/hm/etc/config /usr/local/etc
 RUN     ln -s /usr/local/etc/config /opt/hm/etc && ln -s /usr/local/etc/config /etc
-RUN     cp -a firmware /opt/hm && ln -s /opt/hm/firmware /etc/config/firmware
+RUN     mkdir -p /etc/config/firmware
 RUN     cp -a HMserver/etc/config_templates/log4j.xml /opt/hm/etc/config && cp -a HMserver/opt/HMServer /opt
 RUN     sed -i "s|INFO|WARN|g" /opt/hm/etc/config/log4j.xml
 RUN     cp -a scripts/debian/init.d/* /etc/init.d
