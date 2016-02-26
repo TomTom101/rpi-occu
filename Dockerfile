@@ -11,7 +11,7 @@ RUN 	apt-get update && apt-get install -y \
         rsyslog \
         cron \
         man \
-        sendmail \
+        netbase \
         --no-install-recommends && \
         rm -rf /var/lib/apt/lists/*
 
@@ -33,7 +33,8 @@ RUN     wget -O occu.zip https://github.com/eq-3/occu/archive/${OCCU_VERSION}.zi
 WORKDIR /root/temp/occu-${OCCU_VERSION}/arm-gnueabihf
 RUN     ./install.sh
 WORKDIR /root/temp/occu-${OCCU_VERSION}
-RUN     ln -s /opt/hm/etc/config /usr/local/etc && ln -s /opt/hm/etc/config /etc
+RUN     mv /opt/hm/etc/config /usr/local/etc
+RUN     ln -s /usr/local/etc/config /opt/hm/etc && ln -s /usr/local/etc/config /etc
 RUN     cp -a firmware /opt/hm && ln -s /opt/hm/firmware /etc/config/firmware
 RUN     cp -a HMserver/etc/config_templates/log4j.xml /opt/hm/etc/config && cp -a HMserver/opt/HMServer /opt
 RUN     sed -i "s|INFO|WARN|g" /opt/hm/etc/config/log4j.xml
@@ -101,6 +102,8 @@ RUN     mkdir -p /media/sd-mmcblk0/measurement && \
 #       Fix time settings-----------------------------------------------------
 RUN     (crontab -l ; echo "*/30 * * * * /opt/hm/bin/SetInterfaceClock 127.0.0.1:2001") | sort - | uniq - | crontab -
 
+#       Fix for mail plugin---------------------------------------------------
+RUN     ln -s /usr/bin/tclsh /bin/tclsh
 
 #       move back to /root----------------------------------------------------
 WORKDIR /root
