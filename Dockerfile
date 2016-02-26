@@ -87,7 +87,10 @@ sed -i "s|exec /usr/sbin/ubidetach -p /dev/mtd6|#exec /usr/sbin/ubidetach -p /de
 sed -i "s|exec /usr/sbin/ubiformat /dev/mtd6 -y|#exec /usr/sbin/ubiformat /dev/mtd6 -y|g"  /opt/hm/www/config/cp_security.cgi && \
 sed -i "s|exec /usr/sbin/ubiattach -p /dev/mtd6|#exec /usr/sbin/ubiattach -p /dev/mtd6|g"  /opt/hm/www/config/cp_security.cgi && \
 sed -i "s|exec /usr/sbin/ubimkvol /dev/ubi1 -N user -m|#exec /usr/sbin/ubimkvol /dev/ubi1 -N user -m|g"  /opt/hm/www/config/cp_security.cgi && \
-sed -i "s|exec mount /usr/local|#exec mount /usr/local|g"  /opt/hm/www/config/cp_security.cgi
+sed -i "s|exec mount /usr/local|#exec mount /usr/local|g"  /opt/hm/www/config/cp_security.cgi && \
+sed -i "s|exec kill -SIGQUIT 1|reboot|g"  /opt/hm/www/config/cp_security.cgi && \
+sed -i "s|exec mount -o remount,ro /usr/local|#exec mount -o remount,ro /usr/local|g"  /opt/hm/www/config/cp_security.cgi && \
+sed -i "s|exec mount -o remount,rw /usr/local|#exec mount -o remount,rw /usr/local|g"  /opt/hm/www/config/cp_security.cgi
 RUN     touch /var/ids
 
 #       Simulate sd-card------------------------------------------------------
