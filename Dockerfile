@@ -91,7 +91,7 @@ sed -i "s|exec mount /usr/local|#exec mount /usr/local|g"  /opt/hm/www/config/cp
 sed -i "s|exec kill -SIGQUIT 1|reboot|g"  /opt/hm/www/config/cp_security.cgi && \
 sed -i "s|exec mount -o remount,ro /usr/local|#exec mount -o remount,ro /usr/local|g"  /opt/hm/www/config/cp_security.cgi && \
 sed -i "s|exec mount -o remount,rw /usr/local|#exec mount -o remount,rw /usr/local|g"  /opt/hm/www/config/cp_security.cgi
-RUN     touch /var/ids
+RUN     echo SerialNumber=rpi-occu > /var/ids
 
 #       Simulate sd-card------------------------------------------------------
 RUN     mkdir -p /media/sd-mmcblk0/measurement && \
@@ -107,6 +107,13 @@ RUN     (crontab -l ; echo "*/30 * * * * /opt/hm/bin/SetInterfaceClock 127.0.0.1
 
 #       Fix for mail plugin---------------------------------------------------
 RUN     ln -s /usr/bin/tclsh /bin/tclsh
+
+#       Allow to configure logging from webgui--------------------------------
+RUN     sed -i "s|/bin/sh|/bin/bash|g" /etc/init.d/rfd && \
+sed -i "s|/bin/sh|/bin/bash|g" /etc/init.d/regahss && \
+sed -i "s|LOGLEVEL_RFD=0|if [ -f /usr/local/etc/config/syslog ] ; then source /usr/local/etc/config/syslog ; else LOGLEVEL_RFD=5 ; fi|g" /etc/init.d/rfd && \
+sed -i "s|LOGLEVEL_REGAHSS=0|if [ -f /usr/local/etc/config/syslog ] ; then source /usr/local/etc/config/syslog ; LOGLEVEL_REGA=0 ; fi|g" /etc/init.d/regahss && \
+sed -i "s|LOGLEVEL_REGAHSS|LOGLEVEL_REGA|g" /etc/init.d/regahss 
 
 #       move back to /root----------------------------------------------------
 WORKDIR /root
