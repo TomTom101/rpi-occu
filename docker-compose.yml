@@ -15,6 +15,7 @@ services:
    - rpi-occu-init
   hostname: rpi-occu
   privileged: true
+  network_mode: "bridge"
   restart: unless-stopped    
   devices:
    - "/dev/mem:/dev/mem"
