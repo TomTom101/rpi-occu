@@ -1,6 +1,7 @@
 version: '2'
 services:
  rpi-occu-init:
+  container_name: rpi-occu-init
   image: resin/raspberrypi2-debian:jessie
   privileged: true
   restart: unless-stopped    
@@ -8,6 +9,7 @@ services:
   command: /bin/bash -c "if [ ! -d /sys/class/gpio/gpio18 ]; then echo 18 > /sys/class/gpio/export; fi && echo out > /sys/class/gpio/gpio18/direction && sleep infinity"
 
  rpi-occu:
+  container_name: rpi-occu
   image: marbon87/rpi-occu:2.15.5.3
   depends_on:
    - rpi-occu-init
