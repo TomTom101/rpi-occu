@@ -26,12 +26,14 @@ ENV     HM_HOME=/opt/hm
 ENV     LD_LIBRARY_PATH=$HM_HOME/lib
 
 #       Download and unpack occu----------------------------------------------
-ENV     OCCU_VERSION 2.15.5
+ENV     OCCU_VERSION 2.17.15
 RUN     wget -O occu.zip https://github.com/eq-3/occu/archive/${OCCU_VERSION}.zip ; unzip -q occu.zip; rm occu.zip
 
 #       Copy file to /opt/hm---------------------------------------------------
 WORKDIR /root/temp/occu-${OCCU_VERSION}/arm-gnueabihf
 RUN     ./install.sh
+RUN     chmod +x /opt/hm/bin/eq3configcmd
+RUN     ln -sf /opt/hm/bin/* /bin/ && ln -sf /opt/hm/lib/* /lib/
 WORKDIR /root/temp/occu-${OCCU_VERSION}
 RUN     mv /opt/hm/etc/config /usr/local/etc
 RUN     ln -s /usr/local/etc/config /opt/hm/etc && ln -s /usr/local/etc/config /etc
@@ -74,6 +76,7 @@ RUN     sed -i "s|exec /etc/init.d/S01logging start|exec systemctl restart rsysl
 
 #       HMServer--------------------------------------------------------------
 WORKDIR /root/temp/occu-${OCCU_VERSION}/HMserver
+RUN     ln -s /opt/hm/etc/crRFD.conf /etc/crRFD.conf 
 RUN     echo "#!/bin/sh\n### BEGIN INIT INFO\n# Provides:          HMserver\n# Required-Start:    \$network \$remote_fs \$syslog\n# Required-Stop:     \$network \$remote_fs \$syslog\n# Default-Start:     2 3 4 5\n# Default-Stop:      0 1 6\n# Short-Description: HomeMatic HMserver service\n# Description:       HomeMatic HMserver service\n### END INIT INFO\n" "$(tail -n +5 ./etc/init.d)" > /etc/init.d/HMserver
 RUN     chmod +x /etc/init.d/HMserver
 RUN     sed -i "s|java|${JAVA_HOME}/bin/java|g" /etc/init.d/HMserver
@@ -105,9 +108,6 @@ RUN     mkdir -p /media/sd-mmcblk0/measurement && \
 
 #       Fix time settings-----------------------------------------------------
 RUN     (crontab -l ; echo "*/30 * * * * /opt/hm/bin/SetInterfaceClock 127.0.0.1:2001") | sort - | uniq - | crontab -
-
-#       Fix for mail plugin---------------------------------------------------
-RUN     ln -s /usr/bin/tclsh /bin/tclsh
 
 #       Allow to configure logging from webgui--------------------------------
 RUN     sed -i "s|/bin/sh|/bin/bash|g" /etc/init.d/rfd && \
