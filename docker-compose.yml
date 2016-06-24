@@ -10,7 +10,7 @@ services:
 
  rpi-occu:
   container_name: rpi-occu
-  image: marbon87/rpi-occu:2.17.15.1
+  image: marbon87/rpi-occu:2.15.5.3
   depends_on:
    - rpi-occu-init
   hostname: rpi-occu
