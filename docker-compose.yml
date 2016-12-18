@@ -1,4 +1,14 @@
 version: '2'
+networks:
+  rpi-occu_net:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.201.0/24
+        gateway: 172.16.201.1
 services:
  rpi-occu-init:
   container_name: rpi-occu-init
@@ -15,7 +25,9 @@ services:
    - rpi-occu-init
   hostname: rpi-occu
   privileged: true
-  network_mode: "bridge"
+  networks:
+   rpi-occu_net:
+    ipv4_address: 172.16.201.10
   restart: unless-stopped    
   devices:
    - "/dev/mem:/dev/mem"
